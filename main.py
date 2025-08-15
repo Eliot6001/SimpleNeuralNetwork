@@ -110,7 +110,7 @@ def get_predictions(a2):
 def get_accuracy(predictions, y):
     return np.sum(predictions == y) / y.size
 
-def gradient_descent(x, y, alpha, iterations):
+def gradient_descent(x, y, alpha, iterations, force_train):
     if not force_train and all(os.path.exists(f"{file}.npy") for file in ['w1', 'b1', 'w2', 'b2']):
         print("Found existing model files. Loading parameters and skipping training.")
         w1 = np.load('w1.npy')
@@ -122,11 +122,8 @@ def gradient_descent(x, y, alpha, iterations):
 
     for i in range(iterations):
         z1, a1, z2, a2 = forwardprop(w1, b1, w2, b2, x)
-        
         dw1, db1, dw2, db2 = backwardprop(z1, a1, z2, a2, w1, w2, x, y)
-        
         w1, b1, w2, b2 = update_params(w1, b1, w2, b2, dw1, db1, dw2, db2, alpha)
-        
         if i % 10 == 0:
             print(f"Iteration: {i}")
             predictions = get_predictions(a2)
@@ -140,11 +137,6 @@ def gradient_descent(x, y, alpha, iterations):
     return w1, b1, w2, b2
 
 
-
-alpha = 0.1 # learning rate
-iterations = 1500
-
-w1, b1, w2, b2 = gradient_descent(training_images, new_train_labels, alpha, iterations)
 
 def make_predictions(X, W1, b1, W2, b2):
     _, _, _, A2 = forwardprop(W1, b1, W2, b2, X)
@@ -171,8 +163,13 @@ def make_single_prediction(image, w1, b1, w2, b2):
 
 
 
-x = make_predictions(validation_images, w1, b1, w2, b2)
-accuracy = get_accuracy(x, new_test_labels)
+if __name__ == "__main__":
+    alpha = 0.001
+    iterations = 2000
 
-print(f"Validation Accuracy: {accuracy}")
+    w1, b1, w2, b2 = gradient_descent(training_images, new_train_labels, alpha, iterations, force_train=False)
 
+    # Make predictions on the validation data and get the accuracy
+    predictions = make_predictions(validation_images, w1, b1, w2, b2)
+    accuracy = get_accuracy(predictions, new_test_labels)
+    print(f"Validation Accuracy: {accuracy}")
