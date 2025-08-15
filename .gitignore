@@ -1,0 +1,14 @@
+__pycache__/
+
+# Virtual environment directory
+venv/
+.venv/
+
+# Saved model files
+*.npy
+archive (1).zip
+bin
+include
+lib
+lib64
+share
